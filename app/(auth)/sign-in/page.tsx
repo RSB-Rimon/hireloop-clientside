@@ -1,19 +1,16 @@
 "use client"
 
 import Link from "next/link"
-import type { FormEvent } from "react"
+// import type { FormEvent } from "react"
 
-function handleSubmit(event: FormEvent<HTMLFormElement>) {
-  event.preventDefault()
+// function handleSubmit(event: FormEvent<HTMLFormElement>) {
+//   event.preventDefault()
 
-  const formData = new FormData(event.currentTarget)
-  const values = Object.fromEntries(formData.entries())
+//   const formData = new FormData(event.currentTarget)
+//   const values = Object.fromEntries(formData.entries())
 
-  console.info("Sign-in form submitted. Connect your auth logic here.", {
-    ...values,
-    password: "[redacted]",
-  })
-}
+//     console.log("Form submitted with values:", values)
+// }
 
 export default function SignInPage() {
   return (
@@ -47,7 +44,7 @@ export default function SignInPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form  className="space-y-5">
             <label className="block space-y-2 text-sm font-medium text-zinc-200">
               Email address
               <input
