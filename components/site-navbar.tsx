@@ -18,7 +18,7 @@ const links = [
 
 export function SiteNavbar() {
   const router = useRouter()
-  const { data: session, isPending } = useSession()
+  const { data: session, isPending } = useSession() 
 
   const [menuOpen, setMenuOpen] = useState(false)
   
@@ -81,7 +81,7 @@ export function SiteNavbar() {
               </span>
 
               <Button
-                render={<Link href="/dashboard" />}
+                render={<Link href={`/dashboard/${session.user.role || "seeker"}`} />}
                 className="h-8 rounded-lg bg-indigo-500 px-4 text-xs text-white hover:bg-indigo-400"
               >
                 Dashboard
@@ -172,7 +172,7 @@ export function SiteNavbar() {
                   </div>
 
                   <Button
-                    render={<Link href="/dashboard" />}
+                    render={<Link href={`/dashboard/${session.user.role || "seeker"}`} />}
                     onClick={() => setMenuOpen(false)}
                     className="w-full bg-indigo-500 text-white hover:bg-indigo-400"
                   >

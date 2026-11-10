@@ -1,11 +1,7 @@
-import React from 'react';
-
-const RecruiterDashboardPage = () => {
-    return (
-        <div>
-            <h1>Recruiter Dashborad page</h1>
-        </div>
-    );
-};
-
-export default RecruiterDashboardPage;
+export default function RecruiterDashboardPage() {
+  return (
+    <div>
+      <h1>Recruiter dashboard</h1>
+    </div>
+  )
+}

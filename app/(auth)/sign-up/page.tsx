@@ -20,7 +20,11 @@ export default function SignUpPage() {
     const email = String(formData.get("email") ?? "").trim()
     const password = String(formData.get("password") ?? "")
     const confirmPassword = String(formData.get("confirmPassword") ?? "")
-    const role = String(formData.get("role") ?? "")
+    const role = formData.get("role")
+    if (role !== "seeker" && role !== "recruiter" && role !=="admin") {
+      setFormError("Please choose a valid account type.")
+      return
+    }
 
     if (password !== confirmPassword) {
       setFormError("Passwords do not match.")
@@ -163,19 +167,18 @@ export default function SignUpPage() {
                   />
                   Recruiter
                 </label>
-                <label className="flex cursor-not-allowed select-none items-center gap-2 rounded-lg border border-white/10 bg-[#101010] px-3 py-3 text-sm font-medium text-zinc-500">
+                <label className="flex cursor-pointer select-none items-center gap-2 rounded-lg border border-white/10 bg-[#101010] px-3 py-3 text-sm font-medium text-zinc-200">
                   <input
                     type="radio"
                     name="role"
                     value="admin"
-                    className="size-4 accent-indigo-500"
-                    disabled
+                    className="size-4 accent-indigo-500 focus-visible:outline-2 focus-visible:outline-indigo-300"
                   />
-                  Admin (invite only)
+                  Admin
                 </label>
               </div>
               <p className="text-xs leading-5 text-zinc-500">
-                Admin accounts can only be created by an existing administrator.
+                Admin signup is temporarily enabled for testing.
               </p>
             </fieldset>
 

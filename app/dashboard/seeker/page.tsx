@@ -1,11 +1,7 @@
-import React from 'react';
-
-const SekkerDashboardPage = () => {
-    return (
-        <div>
-            <h1>SekkerDashboradPage</h1>
-        </div>
-    );
-};
-
-export default SekkerDashboardPage;
+export default function SeekerDashboardPage() {
+  return (
+    <div>
+      <h1>Seeker dashboard</h1>
+    </div>
+  )
+}

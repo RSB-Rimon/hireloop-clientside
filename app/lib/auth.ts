@@ -1,5 +1,4 @@
 import { betterAuth } from "better-auth"
-import { APIError, createAuthMiddleware } from "better-auth/api"
 import { mongodbAdapter } from "@better-auth/mongo-adapter"
 import { MongoClient } from "mongodb"
 
@@ -18,24 +17,6 @@ export const auth = betterAuth({
         input: true,
       },
     },
-  },
-  hooks: {
-    before: createAuthMiddleware(async (ctx) => {
-      if (
-        ctx.path === "/sign-up/email" &&
-        typeof ctx.body === "object" &&
-        ctx.body !== null &&
-        "role" in ctx.body &&
-        ctx.body.role !== "seeker" &&
-        ctx.body.role !== "recruiter"
-      ) {
-        throw APIError.from("FORBIDDEN", {
-          code: "ADMIN_ROLE_RESTRICTED",
-          message:
-            "Admin accounts must be created by an existing administrator.",
-        })
-      }
-    }),
   },
   socialProviders: {
     github: {
