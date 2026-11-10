@@ -1,18 +1,40 @@
 "use client"
 
+import { authClient } from "@/app/lib/auth-client";
 import Link from "next/link"
-// import type { FormEvent } from "react"
+import { useRouter } from "next/navigation";
+// import { redirect, useRouter } from "next/navigation";
 
-// function handleSubmit(event: FormEvent<HTMLFormElement>) {
-//   event.preventDefault()
+// import { Router } from "next/router";
+import type { FormEvent } from "react"
 
-//   const formData = new FormData(event.currentTarget)
-//   const values = Object.fromEntries(formData.entries())
 
-//     console.log("Form submitted with values:", values)
-// }
 
 export default function SignInPage() {
+    const router = useRouter()
+    const handleSignInEmail = async (e: FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  const formData = new FormData(e.currentTarget);
+  const values = Object.fromEntries(formData.entries());
+ 
+
+  const { data, error } = await authClient.signIn.email({
+    email: values.email as string,
+    password: values.password as string,
+  })
+  if(data){
+    console.log("Sign In successfully", data)
+    router.replace("/")
+      router.refresh()
+   
+  }
+  if (error) {
+    console.error("Error signing in:", error)
+    return
+    }
+   
+}
+
   return (
     <main className="relative flex min-h-svh items-center justify-center overflow-hidden bg-[#101010] px-4 py-12 text-white sm:px-6">
       <div
@@ -44,7 +66,7 @@ export default function SignInPage() {
             </p>
           </div>
 
-          <form  className="space-y-5">
+          <form onSubmit={handleSignInEmail} className="space-y-5">
             <label className="block space-y-2 text-sm font-medium text-zinc-200">
               Email address
               <input

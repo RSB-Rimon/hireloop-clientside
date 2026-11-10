@@ -1,29 +1,62 @@
 "use client"
 
-
 import { authClient } from "@/app/lib/auth-client"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import type { FormEvent } from "react"
-
-const handleSignUpEmail = async (e: FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  const formData = new FormData(e.currentTarget);
-  const values = Object.fromEntries(formData.entries());
- 
-
-  const { data, error } = await authClient.signUp.email({
-    email: values.email as string,
-    password: values.password as string,
-    name: values.name as string,
-  })
-  if (error) {
-    console.error("Error signing up:", error)
-    return
-    }
-    console.log("Sign Up successfully", data)
-}
+import { useState } from "react"
 
 export default function SignUpPage() {
+  const router = useRouter()
+  const [formError, setFormError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSignUpEmail = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setFormError("")
+
+    const formData = new FormData(event.currentTarget)
+    const name = String(formData.get("name") ?? "").trim()
+    const email = String(formData.get("email") ?? "").trim()
+    const password = String(formData.get("password") ?? "")
+    const confirmPassword = String(formData.get("confirmPassword") ?? "")
+    const role = String(formData.get("role") ?? "")
+
+    if (password !== confirmPassword) {
+      setFormError("Passwords do not match.")
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const { data, error } = await authClient.signUp.email({
+        email,
+        password,
+        name,
+        role,
+        callbackURL: "/",
+      })
+
+      if (error) {
+        setFormError(error.message ?? "Unable to create your account.")
+        return
+      }
+
+      if (data) {
+        router.replace("/")
+        router.refresh()
+      }
+    } catch (error) {
+      setFormError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again.",
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <main className="relative flex min-h-svh items-center justify-center overflow-hidden bg-[#101010] px-4 py-12 text-white sm:px-6">
       <div
@@ -106,13 +139,58 @@ export default function SignUpPage() {
               />
             </label>
 
+            <fieldset className="space-y-2">
+              <legend className="text-sm font-medium text-zinc-200">
+                I want to join as a
+              </legend>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="flex cursor-pointer select-none items-center gap-2 rounded-lg border border-white/10 bg-[#101010] px-3 py-3 text-sm font-medium text-zinc-200">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="seeker"
+                    className="size-4 accent-indigo-500 focus-visible:outline-2 focus-visible:outline-indigo-300"
+                    defaultChecked
+                  />
+                  Seeker
+                </label>
+                <label className="flex cursor-pointer select-none items-center gap-2 rounded-lg border border-white/10 bg-[#101010] px-3 py-3 text-sm font-medium text-zinc-200">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="recruiter"
+                    className="size-4 accent-indigo-500 focus-visible:outline-2 focus-visible:outline-indigo-300"
+                  />
+                  Recruiter
+                </label>
+                <label className="flex cursor-not-allowed select-none items-center gap-2 rounded-lg border border-white/10 bg-[#101010] px-3 py-3 text-sm font-medium text-zinc-500">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="admin"
+                    className="size-4 accent-indigo-500"
+                    disabled
+                  />
+                  Admin (invite only)
+                </label>
+              </div>
+              <p className="text-xs leading-5 text-zinc-500">
+                Admin accounts can only be created by an existing administrator.
+              </p>
+            </fieldset>
+
             <button
-    
-              className="mt-2 flex h-11 w-full items-center justify-center rounded-lg bg-indigo-500 px-4 text-sm font-semibold text-white shadow-[0_0_20px_rgba(99,102,241,0.22)] transition hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300"
+              className="mt-2 flex h-11 w-full items-center justify-center rounded-lg bg-indigo-500 px-4 text-sm font-semibold text-white shadow-[0_0_20px_rgba(99,102,241,0.22)] transition hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isSubmitting}
               type="submit"
             >
-              Create account
+              {isSubmitting ? "Creating account..." : "Create account"}
             </button>
+            {formError && (
+              <p aria-live="polite" className="text-sm text-red-400" role="alert">
+                {formError}
+              </p>
+            )}
           </form>
 
           <p className="mt-6 text-center text-sm text-zinc-400">
