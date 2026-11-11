@@ -5,6 +5,7 @@ import { ChevronRight, Send } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { createJob } from "@/app/lib/actions/jobs"
 
 type FieldProps = {
   label: string
@@ -47,11 +48,17 @@ const jobTypes = ["Full-time", "Part-time", "Contract", "Internship"]
 export default function AddNewPage() {
   const [message, setMessage] = useState("")
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+ async function  handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const jobDeta = Object.fromEntries(new FormData(event.currentTarget))
-    console.log("Job details:", jobDeta)
-    setMessage("Form data collected in the browser console.")
+    const formData = new FormData(event.currentTarget)
+    console.log("Job details:", Object.fromEntries(formData))
+
+    const result = await createJob(formData)
+    console.log('created job', result)
+
+
+
+
   }
 
   return (
