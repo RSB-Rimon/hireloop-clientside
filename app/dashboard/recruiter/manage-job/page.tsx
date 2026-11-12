@@ -1,6 +1,6 @@
-"use client"
 
-import { useState } from "react"
+
+
 import Link from "next/link"
 import {
   BriefcaseBusiness,
@@ -10,7 +10,7 @@ import {
   MapPin,
   Pencil,
   Plus,
-  Trash2,
+
   UsersRound,
 } from "lucide-react"
 import {
@@ -21,100 +21,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { getJobs, type JobListing } from "@/app/lib/api/jobs"
 
-type JobListing = {
-  id: string
-  title: string
-  company: string
-  category: string
-  jobType: string
-  isRemote: boolean
-  location: string
-  minSalary: string
-  maxSalary: string
-  frequency: "hour" | "month" | "year"
-  applicants: number
-  status: "Active" | "Expired"
-  deadline: string
-}
-
-const demoJobs: JobListing[] = [
-  {
-    id: "job-1",
-    title: "Frontend Developer",
-    company: "HirePulse Network",
-    category: "Engineering",
-    jobType: "Full-time",
-    isRemote: true,
-    location: "Remote (New York, USA)",
-    minSalary: "€25",
-    maxSalary: "€40",
-    frequency: "hour",
-    applicants: 24,
-    status: "Active",
-    deadline: "2027-05-30",
-  },
-  {
-    id: "job-2",
-    title: "Senior Product Designer",
-    company: "HirePulse Labs",
-    category: "Design",
-    jobType: "Full-time",
-    isRemote: false,
-    location: "London, UK (Hybrid)",
-    minSalary: "€90k",
-    maxSalary: "€115k",
-    frequency: "year",
-    applicants: 19,
-    status: "Active",
-    deadline: "2027-06-14",
-  },
-  {
-    id: "job-3",
-    title: "DevOps Specialist",
-    company: "HirePulse Platform",
-    category: "Infrastructure",
-    jobType: "Full-time",
-    isRemote: false,
-    location: "Berlin, Germany",
-    minSalary: "€95k",
-    maxSalary: "€120k",
-    frequency: "year",
-    applicants: 12,
-    status: "Active",
-    deadline: "2027-06-30",
-  },
-  {
-    id: "job-4",
-    title: "Product Marketing Lead",
-    company: "HirePulse Network",
-    category: "Marketing",
-    jobType: "Full-time",
-    isRemote: true,
-    location: "Remote (USA)",
-    minSalary: "€80k",
-    maxSalary: "€105k",
-    frequency: "year",
-    applicants: 27,
-    status: "Active",
-    deadline: "2027-07-15",
-  },
-  {
-    id: "job-5",
-    title: "QA Automation Engineer",
-    company: "HirePulse Platform",
-    category: "Quality",
-    jobType: "Part-time",
-    isRemote: false,
-    location: "Dublin, Ireland (Hybrid)",
-    minSalary: "€35",
-    maxSalary: "€50",
-    frequency: "hour",
-    applicants: 8,
-    status: "Expired",
-    deadline: "2026-05-01",
-  },
-]
+import DashboardDialog from '@/app/components/DashboardDialog'
 
 const frequencyLabels: Record<JobListing["frequency"], string> = {
   hour: "hr",
@@ -138,12 +47,13 @@ function formatDeadline(deadline: string) {
   })
 }
 
-export default function ManageJobPage() {
-  const [jobs, setJobs] = useState(demoJobs)
+ export default async  function  ManageJobPage() {
 
-  function deleteJob(jobId: string) {
-    setJobs((currentJobs) => currentJobs.filter((job) => job.id !== jobId))
-  }
+
+  const jobs = await getJobs()
+  // function deleteJob(jobId: string) {
+  //   setJobs((currentJobs) => currentJobs.filter((job) => job.id !== jobId))
+  // }
 
   return (
     <div className="min-h-full flex-1 bg-[#131315] px-4 py-6 text-white sm:px-6 lg:px-8">
@@ -210,8 +120,17 @@ export default function ManageJobPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {jobs.map((job) => (
-                <TableRow key={job.id} className="h-[54px] border-white/[0.05]">
+              {jobs.map((job) => {
+                const status =
+                  job.status ??
+                  (job.deadline &&
+                  new Date(`${job.deadline}T00:00:00`) < new Date()
+                    ? "Expired"
+                    : "Active")
+                const applicants = job.applicants ?? 0
+
+                return (
+                <TableRow key={job._id} className="h-[54px] border-white/[0.05]">
                   <TableCell className="px-3 py-2">
                     <div className="flex items-center gap-2.5">
                       <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-white/[0.06] bg-[#202024]">
@@ -263,26 +182,26 @@ export default function ManageJobPage() {
                   <TableCell className="px-3 py-2">
                     <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-[11px] text-violet-300">
                       <UsersRound className="size-3.5" aria-hidden="true" />
-                      {job.applicants} Candidates
+                      {applicants} Candidates
                     </span>
                   </TableCell>
                   <TableCell className="px-3 py-2">
                     <span
                       className={
-                        job.status === "Active"
+                        status === "Active"
                           ? "inline-flex rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-medium text-emerald-400"
                           : "inline-flex rounded-full border border-zinc-500/20 bg-zinc-500/10 px-2.5 py-1 text-[10px] font-medium text-zinc-400"
                       }
                     >
-                      {job.status}
+                      {status}
                     </span>
                   </TableCell>
                   <TableCell className="px-3 py-2">
                     <p className="whitespace-nowrap text-[11px] text-zinc-200">
-                      {formatDeadline(job.deadline)}
+                      {job.deadline ? formatDeadline(job.deadline) : "No deadline"}
                     </p>
                     <p className="mt-0.5 text-[10px] text-zinc-600">
-                      {job.status === "Expired" ? "Closed" : "Posted 4d ago"}
+                      {status === "Expired" ? "Closed" : "Active"}
                     </p>
                   </TableCell>
                   <TableCell className="px-3 py-2">
@@ -296,15 +215,16 @@ export default function ManageJobPage() {
                         <Pencil className="size-3" aria-hidden="true" />
                         Edit
                       </Link>
-                      <button
+                      {/* <button
                         type="button"
                         aria-label={`Delete ${job.title}`}
                         title="Delete job"
-                        onClick={() => deleteJob(job.id)}
+                        // onClick={() => deleteJob(job.id)}
                         className="inline-flex size-7 items-center justify-center rounded border border-white/[0.06] bg-[#202024] text-zinc-400 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-400 focus-visible:outline-2 focus-visible:outline-red-400"
                       >
                         <Trash2 className="size-3.5" aria-hidden="true" />
-                      </button>
+                      </button> */}
+                      <DashboardDialog job  = {job}  />
                       <button
                         type="button"
                         aria-label={`More actions for ${job.title}`}
@@ -319,7 +239,8 @@ export default function ManageJobPage() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+                )
+              })}
 
               {jobs.length === 0 && (
                 <TableRow>
@@ -336,8 +257,7 @@ export default function ManageJobPage() {
         </section>
 
         <p className="mt-3 text-[10px] text-zinc-600">
-          Preview uses sample listings. Connect your jobs API to manage real
-          posts and applicants.
+          Job listings are loaded from your jobs API.
         </p>
       </div>
     </div>

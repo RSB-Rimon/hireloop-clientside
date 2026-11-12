@@ -1,6 +1,7 @@
 ﻿"use client"
 
 import { useState, type FormEvent, type ReactNode } from "react"
+import { useRouter } from "next/navigation"
 import { ChevronRight, Send } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -46,19 +47,27 @@ const textareaClassName =
 const jobTypes = ["Full-time", "Part-time", "Contract", "Internship"]
 
 export default function AddNewPage() {
+  const router = useRouter()
   const [message, setMessage] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
- async function  handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
-    console.log("Job details:", Object.fromEntries(formData))
 
-    const result = await createJob(formData)
-    console.log('created job', result)
-
-
-
-
+    setIsSubmitting(true)
+    setMessage("")
+    try {
+      await createJob(formData)
+      router.push("/dashboard/recruiter/manage-job")
+      router.refresh()
+    } catch (error) {
+      setMessage(
+        error instanceof Error ? error.message : "Failed to create the job."
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -252,7 +261,11 @@ export default function AddNewPage() {
           </Section>
         </form>
 
-        <p aria-live="polite" className="mt-3 min-h-5 text-xs text-emerald-300">
+        <p
+          aria-live="polite"
+          className="mt-3 min-h-5 text-xs text-red-400"
+          role="alert"
+        >
           {message}
         </p>
       </div>
@@ -261,9 +274,10 @@ export default function AddNewPage() {
           <Button
             form="job-post-form"
             type="submit"
+            disabled={isSubmitting}
             className="h-11 shrink-0 gap-2 rounded-md bg-violet-600 px-6 text-sm font-medium text-white hover:bg-violet-500"
           >
-            Publish Job
+            {isSubmitting ? "Publishing..." : "Publish Job"}
             <Send className="size-4" aria-hidden="true" />
           </Button>
       </div>
