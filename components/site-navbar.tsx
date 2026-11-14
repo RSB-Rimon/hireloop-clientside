@@ -1,14 +1,12 @@
-
 "use client"
 
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { signOut, useSession} from "@/app/lib/auth-client"
+import { signOut, useSession } from "@/app/lib/auth-client"
 import logo from "@/app/images/logo.png"
 import { Button } from "@/components/ui/button"
-
 
 const links = [
   { label: "Browse Jobs", href: "#jobs" },
@@ -18,29 +16,26 @@ const links = [
 
 export function SiteNavbar() {
   const router = useRouter()
-  const { data: session, isPending } = useSession() 
+  const { data: session, isPending } = useSession()
 
   const [menuOpen, setMenuOpen] = useState(false)
-  
 
   const isLoggedIn = !!session?.user
 
- const handleSignOut = async () => {
-  await signOut({
-    fetchOptions: {
-      onSuccess: () => {
-        router.push("/sign-in")
-        router.refresh()
+  const handleSignOut = async () => {
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/sign-in")
+          router.refresh()
+        },
       },
-    },
-  })
-}
-  
+    })
+  }
 
   return (
     <header className="w-full px-4 pt-4 sm:px-6">
       <div className="mx-auto flex max-w-6xl items-center justify-between rounded-xl border border-white/[0.06] bg-zinc-900/90 px-4 py-3 shadow-lg shadow-black/20 sm:px-6">
-
         {/* Logo */}
         <Link href="/" aria-label="Hireloop home" className="shrink-0">
           <Image
@@ -55,14 +50,13 @@ export function SiteNavbar() {
 
         {/* Desktop Navbar */}
         <div className="hidden items-center gap-8 md:flex">
-
           {/* Navigation Links */}
           <nav aria-label="Main navigation" className="flex items-center gap-8">
             {links.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
-                className="text-xs text-zinc-300 transition-colors hover:text-white"
+                className="type-small text-zinc-300 transition-colors hover:text-white"
               >
                 {link.label}
               </Link>
@@ -76,13 +70,15 @@ export function SiteNavbar() {
             <div className="h-8 w-24 animate-pulse rounded-lg bg-white/5" />
           ) : isLoggedIn ? (
             <>
-              <span className="max-w-32 truncate text-xs text-zinc-300">
+              <span className="type-small max-w-32 truncate text-zinc-300">
                 Hi, {session.user.name}
               </span>
 
               <Button
-                render={<Link href={`/dashboard/${session.user.role || "seeker"}`} />}
-                className="h-8 rounded-lg bg-indigo-500 px-4 text-xs text-white hover:bg-indigo-400"
+                render={
+                  <Link href={`/dashboard/${session.user.role || "seeker"}`} />
+                }
+                className="type-small h-8 rounded-lg bg-indigo-500 px-4 text-white hover:bg-indigo-400"
               >
                 Dashboard
               </Button>
@@ -90,26 +86,26 @@ export function SiteNavbar() {
               <Button
                 variant="ghost"
                 onClick={handleSignOut}
-               
-                className="h-8 text-xs  hover:cursor-pointer"
+
+                className="type-small h-8 hover:cursor-pointer"
               >
-               Sign Out
+                Sign Out
               </Button>
             </>
           ) : (
             <>
               <Link
                 href="/sign-in"
-                className="text-xs font-medium text-indigo-300 transition-colors hover:text-indigo-200"
+                className="type-small type-weight-medium text-indigo-300 transition-colors hover:text-indigo-200"
               >
                 Sign In
               </Link>
 
               <Button
                 render={<Link href="/sign-up" />}
-                className="h-8 rounded-lg bg-indigo-500 px-4 text-xs text-white shadow-[0_0_18px_rgba(99,102,241,0.35)] hover:bg-indigo-400"
+                className="type-small h-8 rounded-lg bg-indigo-500 px-4 text-white shadow-[0_0_18px_rgba(99,102,241,0.35)] hover:bg-indigo-400"
               >
-               Sign Up
+                Sign Up
               </Button>
             </>
           )}
@@ -117,7 +113,6 @@ export function SiteNavbar() {
 
         {/* Mobile Navbar */}
         <div className="relative md:hidden">
-
           {/* Hamburger */}
           <button
             type="button"
@@ -141,15 +136,17 @@ export function SiteNavbar() {
           {/* Mobile Dropdown */}
           {menuOpen && (
             <div className="absolute right-0 z-50 mt-3 w-64 rounded-xl border border-white/10 bg-zinc-900 p-3 shadow-xl shadow-black/40">
-
               {/* Links */}
-              <nav aria-label="Mobile navigation" className="flex flex-col gap-1">
+              <nav
+                aria-label="Mobile navigation"
+                className="flex flex-col gap-1"
+              >
                 {links.map((link) => (
                   <Link
                     key={link.label}
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
-                    className="rounded-md px-3 py-2.5 text-sm text-zinc-300 transition-colors hover:bg-white/5 hover:text-white"
+                    className="type-control rounded-md px-3 py-2.5 text-zinc-300 transition-colors hover:bg-white/5 hover:text-white"
                   >
                     {link.label}
                   </Link>
@@ -163,16 +160,19 @@ export function SiteNavbar() {
                 <div className="h-10 animate-pulse rounded-lg bg-white/5" />
               ) : isLoggedIn ? (
                 <div className="space-y-2">
-
                   <div className="rounded-lg bg-white/5 px-3 py-2">
-                    <p className="text-xs text-zinc-500">Signed in as</p>
-                    <p className="truncate text-sm font-medium text-white">
+                    <p className="type-small text-zinc-500">Signed in as</p>
+                    <p className="type-control type-weight-medium truncate text-white">
                       {session.user.name}
                     </p>
                   </div>
 
                   <Button
-                    render={<Link href={`/dashboard/${session.user.role || "seeker"}`} />}
+                    render={
+                      <Link
+                        href={`/dashboard/${session.user.role || "seeker"}`}
+                      />
+                    }
                     onClick={() => setMenuOpen(false)}
                     className="w-full bg-indigo-500 text-white hover:bg-indigo-400"
                   >
@@ -181,11 +181,11 @@ export function SiteNavbar() {
 
                   <Button
                     variant="ghost"
-                   
+
                     onClick={handleSignOut}
                     className="w-full text-zinc-300 hover:bg-white/5 hover:text-white"
                   >
-                  Sign Out
+                    Sign Out
                   </Button>
                 </div>
               ) : (
